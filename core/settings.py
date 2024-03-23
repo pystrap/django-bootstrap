@@ -130,6 +130,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+if 'APP_SLOT' not in os.environ:  # this is development
+    parser = ConfigParser()
+    parser.read(os.path.join(BASE_DIR, 'misc/env.ini'))
+    ENV = parser['app']
+
 if 'DBNAME' in os.environ:
     DATABASES = {
         'default': {
