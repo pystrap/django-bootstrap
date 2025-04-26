@@ -29,9 +29,11 @@ Remove the current Git history:
 
 ---
 
-## 🛠️ Create a Virtual Environment:
+## 🛠️ Open Project and Create a Virtual Environment:
 
 In **PyCharm**:
+
+- Open folder (project)
 
 1. Go to **Settings** → **Project: _your-project-name_** → **Python Interpreter**
 2. Click the ⚙️ next to the interpreter selector → **Add Interpreter**
@@ -52,6 +54,7 @@ source venv/Scripts/activate  # (on Windows)
 - Move the `.env` file into your `venv/` directory.
 - Configure your `.env` (especially database connection details).
 - Create a `/media/` folder for serving uploaded files.
+- Move `cors_server.py` to the media folder created.
 
 To serve media files:
 
