@@ -1,7 +1,7 @@
 import os
 from uuid import uuid4
 
-from PIL import Image
+from PIL import Image, ExifTags
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -13,7 +13,7 @@ import json
 
 from django.db import models
 
-from utils.fns import get_object_view_link
+from core.fns import get_object_view_link
 
 Image.MAX_IMAGE_PIXELS = None  # Set to None to disable the limit
 
@@ -69,8 +69,8 @@ class EntityLinkMixin:
 
 class User(AbstractUser):
     # Add custom fields here
-    age = models.PositiveIntegerField(blank=True, null=True)
     last_seen = models.DateTimeField(null=True, blank=True)
+    need_reset_password = models.BooleanField(default=False)
 
     @property
     def full_name(self):
@@ -225,7 +225,6 @@ class ImageFile(BaseFile):
     def img_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail
-
         if not self.file or not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.file.name)):
             return 'https://dummyimage.com/150/bbbbbb/eeeeee&text=No+Image'
 
@@ -239,18 +238,35 @@ class ImageFile(BaseFile):
         thumbnail_size = (200, 200)
 
         try:
-            image = Image.open(os.path.join(settings.MEDIA_ROOT, self.file.name))
-            image.thumbnail(thumbnail_size, Image.ANTIALIAS)
+            image_path = os.path.join(settings.MEDIA_ROOT, self.file.name)
 
-            # Save the thumbnail
-            os.makedirs(os.path.join(settings.MEDIA_ROOT, os.path.dirname(thumbnail_path)), exist_ok=True)
-            image.save(os.path.join(settings.MEDIA_ROOT, thumbnail_path), quality=100)
+            # Open the image and preserve the original EXIF metadata
+            with Image.open(image_path) as image:
+                if hasattr(image, '_getexif'):  # Check if the image has EXIF data
+                    exif = image._getexif()
+                    if exif is not None:
+                        for key, value in exif.items():
+                            tag = ExifTags.TAGS.get(key)
+                            if tag == 'Orientation':
+                                if value == 3:
+                                    image = image.rotate(180, expand=True)
+                                elif value == 6:
+                                    image = image.rotate(270, expand=True)
+                                elif value == 8:
+                                    image = image.rotate(90, expand=True)
 
-            thumbnail = os.path.join(settings.MEDIA_URL, thumbnail_path)
-            self.thumbnail = thumbnail
-            self.save(update_fields=['thumbnail'])
-            return thumbnail
-        except:
+                image.thumbnail(thumbnail_size, Image.BICUBIC)
+
+                # Save the thumbnail
+                os.makedirs(os.path.join(settings.MEDIA_ROOT, os.path.dirname(thumbnail_path)), exist_ok=True)
+                image.save(os.path.join(settings.MEDIA_ROOT, thumbnail_path), quality=100)
+
+                thumbnail = os.path.join(settings.MEDIA_URL, thumbnail_path)
+                self.thumbnail = thumbnail
+                self.save(update_fields=['thumbnail'])
+                return thumbnail
+        except Exception as e:
+            print(e)
             return 'https://dummyimage.com/150/bbbbbb/eeeeee&text=Image+Error'
 
     class Meta:
@@ -258,3 +274,4 @@ class ImageFile(BaseFile):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+

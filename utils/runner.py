@@ -19,4 +19,4 @@ class Runner:
 
 
 # Example usage
-Runner.run("./create_website.sh", domain="test3.cweb.app", ip="203.161.61.79", username="node_manager")
+# Runner.run("./create_website.sh", domain="test3.cweb.app", ip="203.161.61.79", username="node_manager")

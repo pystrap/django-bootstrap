@@ -341,7 +341,7 @@ def get_object_view_link(target_object, target_object_id, base_id=None):
 
 
 def media_url(media_path, frontend=False):
-    path = str(media_path)
+    path = str(media_path).replace("\\", "/")
     if not path:
         return ''
     if path.startswith('http'):
@@ -351,5 +351,5 @@ def media_url(media_path, frontend=False):
         origin = f"{parsed_url.scheme}://{parsed_url.netloc}"
         return urljoin(origin, path)
     base = settings.STORAGE_URL
-    sas_token = settings.AZURE_SAS_TOKEN
+    sas_token = settings.STORAGE_TOKEN
     return '/'.join([base.rstrip('/'), path.lstrip('/')]) + sas_token

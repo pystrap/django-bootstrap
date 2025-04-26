@@ -14,8 +14,13 @@ admin.site.register(AppSettings, AppSettingsAdmin)
 
 
 class CustomUserAdmin(UserAdmin):
-    # Add custom admin configuration here
-    pass
+    # Define custom fields to display and edit
+    fieldsets = UserAdmin.fieldsets + (
+        ('User', {'fields': ('last_seen', 'need_reset_password')}),  # Add your custom fields here
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('first_name', 'last_name', 'email', 'is_model',)}),  # Add your custom fields for user creation
+    )
 
 
 admin.site.register(User, CustomUserAdmin)

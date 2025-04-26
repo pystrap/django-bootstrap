@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import datetime
 import os
-from configparser import ConfigParser
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,12 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3f-lc%1x*=c47&un-m4d*18b%2i=%d1#6b7u3_t^+oovwcot1$'
+SECRET_KEY = 'django-insecure-j5&phl55aox(hqj*9mbq^hy0xgc2_q_9o2d*+@vyw1cn(v3e-%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost']
+CSRF_TRUSTED_ORIGINS = [
+    'https://qmodels.co.uk',
+    'https://*.qmodels.co.uk',
+]
 
 
 # Application definition
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
+    'portfolio.apps.PortfolioConfig',
     'mailer.apps.MailerConfig',
     'django_countries',
     'django_cleanup.apps.CleanupConfig',
@@ -55,7 +61,6 @@ INSTALLED_APPS = [
     'tinymce',
     'corsheaders',
 ]
-
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'PAGE_SIZE': 200,
@@ -73,7 +78,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=10),
     'ROTATE_REFRESH_TOKENS': True,
 }
-
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
@@ -82,7 +86,7 @@ AUTHENTICATION_BACKENDS = (
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # must be before CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -90,6 +94,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'core.middleware.last_seen_middleware.UpdateLastSeenMiddleware',
+    'core.middleware.subdomain_middleware.SubdomainMiddleware',
 ]
 CORS_ALLOW_HEADERS = (
     *default_headers,
@@ -101,11 +106,6 @@ CORS_ALLOW_HEADERS = (
     'Sec-Ch-Ua-Platform',
 )
 CORS_ALLOW_CREDENTIALS = True
-FRONTEND_APP_DIR = 'http://localhost:3000/cms'
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000'
-]
-
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -129,39 +129,24 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-if 'APP_SLOT' not in os.environ:  # this is development
-    parser = ConfigParser()
-    parser.read(os.path.join(BASE_DIR, 'misc/env.ini'))
-    ENV = parser['app']
-
-if 'DBNAME' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['DBNAME'],
-            'HOST': os.environ['DBHOST'],
-            'USER': os.environ['DBUSER'],
-            'PASSWORD': os.environ['DBPASS'],
-            'PORT': os.environ['DBPORT'],
-            'OPTIONS': {'sslmode': 'require'},
-        }
-    }
+if 'APP_SLOT' in os.environ:  # this is development
+    ENV = os.environ
 else:
-    parser = ConfigParser()
-    parser.read(os.path.join(BASE_DIR, 'misc/db.ini'))
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': parser.get('postgresql', 'database'),
-            'USER': parser.get('postgresql', 'user'),
-            'PASSWORD': parser.get('postgresql', 'password'),
-            'HOST': parser.get('postgresql', 'host'),
-            'PORT': parser.get('postgresql', 'port'),
-        }
-    }
+    load_dotenv(os.path.join(BASE_DIR, 'venv/.env'))
+    ENV = os.environ
 
-AUTH_USER_MODEL = 'core.User'
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': ENV.get('DBNAME'),
+        'HOST': ENV.get('DBHOST'),
+        'USER': ENV.get('DBUSER'),
+        'PASSWORD': ENV.get('DBPASS'),
+        'PORT': ENV.get('DBPORT'),
+        # 'OPTIONS': {'sslmode': 'require'},
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -180,13 +165,46 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+AUTH_USER_MODEL = 'core.User'
 
+
+# Internationalization
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
+
+LANGUAGE_CODE = 'en-gb'
+TIME_ZONE = 'Europe/London'
+USE_I18N = True
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_ROOT = BASE_DIR / "media"
 ENTITY_FILES_BASE = "entity_files"
 ENTITY_FILES_DIR = os.path.join(MEDIA_ROOT, ENTITY_FILES_BASE)
+STORAGE_URL = ENV.get('STORAGE_URL')
+STORAGE_TOKEN = ENV.get('STORAGE_TOKEN')
+FRONTEND_APP_DIR = ENV.get('FRONTEND_APP_DIR')
+CORS_ALLOWED_ORIGINS = [
+    f"{urlparse(FRONTEND_APP_DIR).scheme}://{urlparse(FRONTEND_APP_DIR).netloc}",
+]
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_SEND_EMAILS = False
+
+EMAIL_HOST_USER = ENV.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = ENV.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = ENV.get('EMAIL_HOST')
+EMAIL_PORT = ENV.get('EMAIL_PORT')
+EMAIL_USE_TLS = bool(ENV.get('EMAIL_USE_TLS'))
+EMAIL_USE_SSL = bool(ENV.get('EMAIL_USE_SSL'))
 
 TINYMCE_DEFAULT_CONFIG = {
     'theme': "silver",
@@ -199,24 +217,4 @@ TINYMCE_DEFAULT_CONFIG = {
         "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table powerpaste advcode help wordcount spellchecker typography",
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LIST_PER_PAGE = 20
