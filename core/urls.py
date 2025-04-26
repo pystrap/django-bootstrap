@@ -5,6 +5,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from utils.viewsets import AdminToolsViewSet, AccountViewSet
+from . import views
 from .viewsets import LoginViewSet, RefreshViewSet, ChangePasswordView, UserViewSet
 
 router = routers.SimpleRouter()
@@ -20,6 +21,7 @@ router.register(r'admin_tools', AdminToolsViewSet, basename='admin_tools')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index),
     path('', include('mailer.urls')),
     path('api/', include(router.urls)),
     path('api/auth/change_password/', ChangePasswordView.as_view()),

@@ -16,18 +16,21 @@ Add interpreter next to the python interpreter selector
 Click Add Local Interpreter
 On the virtual environment tab click new and set it up
 
-- install dependencies
-  pip install -r requirements.txt
-
-- move .env to venv directory and configure including db connection details
+- move .env to venv directory
+  configure .env including db connection details
 - create /media
 - move cors_server.py to /media for serving media storage files --
 - to start media files server:
   cd media
-  python cors_server.py 8888
-- (or any port for media)
+
+- install dependencies
+  pip install -r requirements.txt
+
   Start Server
   python manage.py runserver
+  python cors_server.py 8888
+
+- (or any port for media)
 
   Initialize new repo:
   git init

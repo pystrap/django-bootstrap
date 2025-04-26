@@ -93,7 +93,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'core.middleware.last_seen_middleware.UpdateLastSeenMiddleware',
-    'core.middleware.subdomain_middleware.SubdomainMiddleware',
 ]
 CORS_ALLOW_HEADERS = (
     *default_headers,
