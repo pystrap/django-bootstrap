@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
-    'portfolio.apps.PortfolioConfig',
     'mailer.apps.MailerConfig',
     'django_countries',
     'django_cleanup.apps.CleanupConfig',

@@ -1,13 +1,12 @@
 import os
 import logging
+from urllib.parse import urlparse
 
 from django.views.generic import View
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 # Create your views here.
-from portfolio.models import Portfolio
-from portfolio.serializers import PortfolioFrontendSerializer
 
 
 def index(request):

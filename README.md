@@ -28,6 +28,7 @@ On the virtual environment tab click new and set it up
 - (or any port for media)
   Start Server
   python manage.py runserver
+
   Initialize new repo:
   git init
   git remote add origin https://github.com/your-username/my-new-project.git

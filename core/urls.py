@@ -4,10 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from portfolio.viewsets import PortfolioViewSet
 from utils.viewsets import AdminToolsViewSet, AccountViewSet
-from . import views
-from portfolio import views as portfolio_views
 from .viewsets import LoginViewSet, RefreshViewSet, ChangePasswordView, UserViewSet
 
 router = routers.SimpleRouter()
@@ -20,8 +17,6 @@ router.register(r'account', AccountViewSet, basename='account')
 
 # utils
 router.register(r'admin_tools', AdminToolsViewSet, basename='admin_tools')
-# portfolio
-router.register(r'portfolio', PortfolioViewSet, basename='portfolio')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

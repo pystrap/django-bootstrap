@@ -106,7 +106,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class LoginUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'portfolio', 'is_model']
+        fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'email']
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
