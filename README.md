@@ -1,44 +1,134 @@
-# django-bootstrap
+# Django Bootstrap
 
-- Quick setup of django with drf
+🚀 Quick setup for Django with Django REST Framework (DRF).
 
-To Clone:
+---
+
+## 📥 To Clone:
+
+```bash
 git clone https://github.com/pystrap/django-bootstrap.git my-project
 cd my-project
-remove current repo file (.git) on explorer
-rmdir /s /q .git (if using git bash do rm -rf .git, Powershell: Remove-Item -Recurse -Force .git)
+```
 
-Create venv:
-Go to Settings on Pycharm
-select Project: <project-name>
-Select Python Interpreter
-Add interpreter next to the python interpreter selector
-Click Add Local Interpreter
-On the virtual environment tab click new and set it up
+Remove the current Git history:
 
-- move .env to venv directory
-  configure .env including db connection details
-- create /media
-- move cors_server.py to /media for serving media storage files --
-- to start media files server:
-  cd media
+- **File Explorer:** Delete the `.git` folder manually (make sure hidden files are visible)
+- **Git Bash:**
+  ```bash
+  rm -rf .git
+  ```
+- **Command Prompt:**
+  ```cmd
+  rmdir /s /q .git
+  ```
+- **PowerShell:**
+  ```powershell
+  Remove-Item -Recurse -Force .git
+  ```
 
-- install dependencies
-  pip install -r requirements.txt
+---
 
-  Start Server
+## 🛠️ Create a Virtual Environment:
+
+In **PyCharm**:
+
+1. Go to **Settings** → **Project: _your-project-name_** → **Python Interpreter**
+2. Click the ⚙️ next to the interpreter selector → **Add Interpreter**
+3. Choose **Add Local Interpreter**
+4. Under the **Virtual Environment** tab, click **New environment** and set it up.
+
+Or manually via terminal:
+
+```bash
+python -m venv venv
+source venv/Scripts/activate  # (on Windows)
+```
+
+---
+
+## ⚙️ Initial Setup:
+
+- Move the `.env` file into your `venv/` directory.
+- Configure your `.env` (especially database connection details).
+- Create a `/media/` folder for serving uploaded files.
+
+To serve media files:
+
+```bash
+cd media
+python cors_server.py 8888  # or any port
+```
+
+---
+
+## 📦 Install Dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 🔥 Setup Database:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+---
+
+## 🚀 Start Servers:
+
+- Start Django development server:
+
+  ```bash
   python manage.py runserver
+  ```
+
+- Start Media server:
+
+  ```bash
+  cd media
   python cors_server.py 8888
+  ```
 
-- (or any port for media)
+_(Use any free port if 8888 is busy.)_
 
-  Initialize new repo:
-  git init
-  git remote add origin https://github.com/your-username/my-new-project.git
-  git add .
-  git commit -m "Initial commit from my Django bootstrap"
-  git push -u origin main
+---
 
-If you need to login, Install github CLI if not already install, then:
-gh auth login
-use ssh accept login in browser and add projects/organizations
+## 🌐 Initialize a New Git Repository:
+
+```bash
+git init
+git remote add origin https://github.com/your-username/my-new-project.git
+git add .
+git commit -m "Initial commit from my Django bootstrap"
+git push -u origin main
+```
+
+---
+
+## 🔐 GitHub Authentication (Optional):
+
+If you need to authenticate with GitHub:
+
+1. Install the [GitHub CLI](https://cli.github.com/) if not already installed.
+2. Run:
+
+   ```bash
+   gh auth login
+   ```
+
+3. Use **SSH** method → Accept login in browser → Add your project to your GitHub account or organization.
+
+---
+
+## 📚 Notes:
+
+- `cors_server.py` is a lightweight server for media file handling in development.
+
+---
+
+# 🎉 Happy Building!
