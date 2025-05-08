@@ -102,11 +102,24 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'email']
 
-
 class LoginUserSerializer(serializers.ModelSerializer):
+    groups = serializers.SerializerMethodField()
+
+    def get_groups(self, user):
+        groups = list(user.groups.values_list('name', flat=True))
+        if user.is_superuser:
+            groups.append('Super Admin')
+        if not len(groups):
+            if user.is_staff:
+                groups.append('Staff')
+            else:
+                groups.append('User')
+
+        return groups
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'full_name', 'email']
+        fields = ['id', 'email', 'username', 'first_name', 'last_name', 'full_name', 'display_name', 'groups']
 
 
 class UserAccountSerializer(serializers.ModelSerializer):

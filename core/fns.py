@@ -1,6 +1,7 @@
 import math
 import json
 import random
+import secrets
 import string
 from urllib.parse import urljoin, urlparse
 import bleach
@@ -353,3 +354,8 @@ def media_url(media_path, frontend=False):
     base = settings.STORAGE_URL
     sas_token = settings.STORAGE_TOKEN
     return '/'.join([base.rstrip('/'), path.lstrip('/')]) + sas_token
+
+def random_string(length=16, charset=None):
+    if charset is None:
+        charset = string.ascii_lowercase + string.digits
+    return ''.join(secrets.choice(charset) for _ in range(length))

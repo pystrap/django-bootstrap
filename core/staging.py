@@ -17,7 +17,4 @@ ENTITY_FILES_DIR = os.path.join(MEDIA_ROOT, "entity_files")
 # Email configurations
 EMAIL_SEND_EMAILS = False
 
-CORS_ALLOWED_ORIGINS = [
-    f"{urlparse(FRONTEND_APP_DIR).scheme}://{urlparse(FRONTEND_APP_DIR).netloc}",
-]
 

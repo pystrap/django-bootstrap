@@ -36,6 +36,41 @@ def get_thumbnail_path(original_path):
     return thumbnail_path
 
 
+class MetaFieldMixin(models.Model):
+    meta = models.JSONField(default=dict)
+
+    class Meta:
+        abstract = True  # Ensures this mixin is abstract and won't create a database table
+
+    def get_meta(self, key, default=None):
+        """
+        Retrieve a value from the meta field by key.
+        Returns the default value if the key does not exist.
+        """
+        return self.meta.get(key, default)
+
+    def set_meta(self, key, value):
+        """
+        Set a key-value pair in the meta field and save the model.
+        """
+        self.meta[key] = value
+        self.save(update_fields=['meta'])
+
+    def delete_meta(self, key):
+        """
+        Remove a key from the meta field and save the model.
+        """
+        if key in self.meta:
+            del self.meta[key]
+            self.save(update_fields=['meta'])
+
+    def has_meta(self, key):
+        """
+        Check if a key exists in the meta field.
+        """
+        return key in self.meta
+
+
 class EntityLinkMixin:
     @property
     def entity_model(self):
@@ -75,6 +110,10 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return ' '.join([i for i in [self.first_name, self.last_name] if i])
+
+    @property
+    def display_name(self):
+        return self.full_name or self.username
 
     class Meta:
         db_table = 'auth_user'
